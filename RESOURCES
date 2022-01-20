@@ -1,2 +1,5 @@
 https://el3um4s.medium.com/how-to-test-sveltekit-app-with-jest-848afa8edbc7
 repo: https://github.com/el3um4s/memento-sveltekit-jest
+
+if jest is running tests that are deleted, clear cache by changing in package.json:
+"test": "jest --clearCache"

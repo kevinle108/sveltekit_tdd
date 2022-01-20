@@ -3,10 +3,14 @@
  */
 
 import SignUpPage from '$lib/SignUpPage.svelte';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, fireEvent } from '@testing-library/svelte';
+import '@testing-library/jest-dom'
 
-it('has Sign Up header', () => {
-  render(SignUpPage);
-  const header = screen.getByRole('heading', { name: 'Sign Up' });
-  expect(header).toBeTruthy();
+describe('Sign Up Page', () => {
+  it('has Sign Up header', () => {
+    render(SignUpPage);
+    const header = screen.getByRole('heading', { name: 'Sign Up' });
+    expect(header).toBeInTheDocument();
+  });
 });
+
