@@ -4,6 +4,7 @@
 
 import SignUpPage from '$lib/SignUpPage.svelte';
 import { render, screen } from '@testing-library/svelte';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom'
 
 describe('Sign Up Page', () => {
@@ -50,13 +51,31 @@ describe('Sign Up Page', () => {
       expect(input.type).toBe('password')
     });
 
-    it('has a sign up button', () => {
+    it('has a Sign Up button', () => {
       render(SignUpPage);
       const button = screen.getByRole('button', {name: 'Sign Up'});
       expect(button).toBeInTheDocument();
     });
+    
+    it('has a Sign Up button disabled', () => {
+      render(SignUpPage);
+      const button = screen.getByRole('button', {name: 'Sign Up'});
+      expect(button).toBeDisabled();
+    });
 
+  });
+  
+  describe('Interactions', () => {
+    it('enables button once both password inputs match', async () => {
+      render(SignUpPage);
+      const pw1 = screen.getByLabelText('Password') as HTMLElement;
+      const pw2 = screen.getByLabelText('Password Repeat') as HTMLElement;
+      await userEvent.type(pw1, 'P4ssword');
+      await userEvent.type(pw2, 'P4ssword');
 
-  });  
+      const button = screen.getByRole('button', {name: 'Sign Up'});
+      expect(button).toBeEnabled();
+    });
+  });
 });
 
