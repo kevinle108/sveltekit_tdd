@@ -10,22 +10,22 @@
   $: disabled = (password1 && password2) ? password1 !== password2 : true;
 
   const submit = () => {
-    // axios.post('/api/1.0/users', {
-    //   username: username,
-    //   email: email,
-    //   password: password1
-    // });
-    fetch('/api/1.0/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username,
-        email,
-        password: password1
-      })
+    axios.post('/api/1.0/users', {
+      username: username,
+      email: email,
+      password: password1
     });
+    // fetch('/api/1.0/users', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     username,
+    //     email,
+    //     password: password1
+    //   })
+    // });
   }
 
 </script>
