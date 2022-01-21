@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import axios from 'axios';
 import 'whatwg-fetch';
+import { setupServer } from 'msw/node';
+import { rest } from 'msw';
 
 describe('Sign Up Page', () => {
   describe('Layout', () => {
@@ -80,6 +82,16 @@ describe('Sign Up Page', () => {
     });
 
     it('sends username, email, and password to backend after clicking the button', async () => {
+      let requestBody;
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          requestBody = req.body;
+          return res(ctx.status(200));
+        })
+      );
+      server.listen();
+
+
       render(SignUpPage);
       const username = screen.getByLabelText('Username') as HTMLElement;
       const email = screen.getByLabelText('Email') as HTMLElement;
@@ -92,14 +104,11 @@ describe('Sign Up Page', () => {
       await userEvent.type(pw2, 'P4ssword');
       const button = screen.getByRole('button', {name: 'Sign Up'});
 
-      const mockFn = jest.fn();
-      // axios.post = mockFn;
-      window.fetch = mockFn;
-
       await userEvent.click(button);
-      const firstCall = mockFn.mock.calls[0]; // axios( url, {body} )
-      const body = JSON.parse(firstCall[1].body);
-      expect(body).toEqual({
+
+      await server.close();
+
+      expect(requestBody).toEqual({
         username: "user1",
         email: "user1@mail.com",
         password: "P4ssword"
