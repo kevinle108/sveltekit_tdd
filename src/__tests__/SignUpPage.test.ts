@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import axios from 'axios';
+import 'whatwg-fetch';
 
 describe('Sign Up Page', () => {
   describe('Layout', () => {
@@ -92,10 +93,12 @@ describe('Sign Up Page', () => {
       const button = screen.getByRole('button', {name: 'Sign Up'});
 
       const mockFn = jest.fn();
-      axios.post = mockFn;
+      // axios.post = mockFn;
+      window.fetch = mockFn;
+
       await userEvent.click(button);
       const firstCall = mockFn.mock.calls[0]; // axios( url, {body} )
-      const body = firstCall[1];
+      const body = JSON.parse(firstCall[1].body);
       expect(body).toEqual({
         username: "user1",
         email: "user1@mail.com",
