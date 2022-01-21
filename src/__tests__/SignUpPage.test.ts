@@ -5,7 +5,8 @@
 import SignUpPage from '$lib/SignUpPage.svelte';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
+import axios from 'axios';
 
 describe('Sign Up Page', () => {
   describe('Layout', () => {
@@ -75,6 +76,31 @@ describe('Sign Up Page', () => {
 
       const button = screen.getByRole('button', {name: 'Sign Up'});
       expect(button).toBeEnabled();
+    });
+
+    it('sends username, email, and password to backend after clicking the button', async () => {
+      render(SignUpPage);
+      const username = screen.getByLabelText('Username') as HTMLElement;
+      const email = screen.getByLabelText('Email') as HTMLElement;
+      const pw1 = screen.getByLabelText('Password') as HTMLElement;
+      const pw2 = screen.getByLabelText('Password Repeat') as HTMLElement;
+
+      await userEvent.type(username, 'user1');
+      await userEvent.type(email, 'user1@mail.com');
+      await userEvent.type(pw1, 'P4ssword');
+      await userEvent.type(pw2, 'P4ssword');
+      const button = screen.getByRole('button', {name: 'Sign Up'});
+
+      const mockFn = jest.fn();
+      axios.post = mockFn;
+      await userEvent.click(button);
+      const firstCall = mockFn.mock.calls[0]; // axios( url, {body} )
+      const body = firstCall[1];
+      expect(body).toEqual({
+        username: "user1",
+        email: "user1@mail.com",
+        password: "P4ssword"
+      });
     });
   });
 });
