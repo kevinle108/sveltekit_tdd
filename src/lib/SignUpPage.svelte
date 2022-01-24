@@ -4,16 +4,16 @@
    let disabled = true;
    let username: string;
    let email: string;
-   let password1: string;
-   let password2: string;
+   let password: string;
+   let passwordRepeat: string;
 
-  $: disabled = (password1 && password2) ? password1 !== password2 : true;
+  $: disabled = (password && passwordRepeat) ? password !== passwordRepeat : true;
 
   const submit = () => {
     axios.post('/api/1.0/users', {
-      username: username,
-      email: email,
-      password: password1
+      username,
+      email,
+      password
     });
     // fetch('/api/1.0/users', {
     //   method: 'POST',
@@ -23,29 +23,41 @@
     //   body: JSON.stringify({
     //     username,
     //     email,
-    //     password: password1
+    //     password: password
     //   })
     // });
   }
 
 </script>
+<div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+  <form class="card mt-5">
+    <div class="card-header">
+      <h1 class="text-center">Sign Up</h1>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" class="form-control" bind:value={username}/>
+      </div>
+      <div class="form-group">
+        <label for="e-mail">E-mail</label>
+        <input id="e-mail" class="form-control" bind:value={email}/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" class="form-control" bind:value={password}/>
+      </div>
+      <div class="form-group">
+        <label for="password-repeat">Password Repeat</label>
+        <input id="password-repeat" type="password" class="form-control" bind:value={passwordRepeat}/>
+      </div>
+      <div class="text-center">
+        <button class="btn btn-primary" {disabled} on:click|preventDefault={submit}>Sign Up</button>
+      </div>
+    </div>
+  </form>
+</div>
 
-<form>
-  <h1>Sign Up</h1>
-  <label for="username">Username</label>
-  <input id="username" bind:value={username}/>
-  
-  <label for="email">Email</label>
-  <input id="email" bind:value={email}/>
-  
-  <label for="password">Password</label>
-  <input id="password" type="password" bind:value={password1}/>
-  
-  <label for="password-repeat">Password Repeat</label> 
-  <input id="password-repeat" type="password" bind:value={password2}/>
-  
-  <button {disabled} on:click|preventDefault={submit}>Sign Up</button>
-</form>
 
 
 

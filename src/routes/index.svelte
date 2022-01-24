@@ -4,3 +4,4 @@
 </script>
 
 <SignUpPage></SignUpPage>
+<h1>Header in App</h1>
