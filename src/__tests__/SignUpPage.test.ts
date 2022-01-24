@@ -3,7 +3,7 @@
  */
 
 import SignUpPage from '$lib/SignUpPage.svelte';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import axios from 'axios';
@@ -185,6 +185,26 @@ describe('Sign Up Page', () => {
       expect(text).not.toBeInTheDocument();
     });
 
+    it('hides sign up form after successful sign up request', async () => {
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(200));
+        })
+      );
+
+      server.listen();
+      await setup();
+      const button = screen.getByRole('button', {name: 'Sign Up'});
+
+      await userEvent.click(button);
+      await server.close();
+
+      const form = screen.getByTestId('sign-up-form');
+      await waitFor(() => {
+        expect(form).not.toBeInTheDocument();
+      });
+    });
+
     it('does not display account activation message after failed sign up request', async () => {
       const server = setupServer(
         rest.post('/api/1.0/users', (req, res, ctx) => {
@@ -202,6 +222,8 @@ describe('Sign Up Page', () => {
       const text = screen.queryByText('Please check your e-mail to activate your account');
       expect(text).not.toBeInTheDocument();
     });
+    
+    
   });
 });
 
