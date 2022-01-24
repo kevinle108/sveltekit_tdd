@@ -7,28 +7,21 @@
    let password: string;
    let passwordRepeat: string;
    let apiProgress;
+   let signUpSuccess = false;
 
   $: disabled = (password && passwordRepeat) ? password !== passwordRepeat : true;
 
   const submit = () => {
+    disabled = true;
     apiProgress = axios.post('/api/1.0/users', {
       username,
       email,
       password
     });
-    disabled = true;
+    apiProgress.then(() => {
+      signUpSuccess = true;
+    });
     
-    // fetch('/api/1.0/users', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     username,
-    //     email,
-    //     password: password
-    //   })
-    // });
   }
 
 </script>
@@ -64,6 +57,9 @@
       </div>
     </div>
   </form>
+  {#if signUpSuccess}
+    <div class="alert alert-success">Please check your e-mail to activate your account</div>    
+  {/if}
 </div>
 
 
