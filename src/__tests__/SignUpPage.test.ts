@@ -27,7 +27,7 @@ describe('Sign Up Page', () => {
 
     it('has email input', () => {
       render(SignUpPage);
-      const input = screen.getByLabelText('Email');
+      const input = screen.getByLabelText('E-mail');
       expect(input).toBeInTheDocument();
     });
     
@@ -70,12 +70,21 @@ describe('Sign Up Page', () => {
   });
   
   describe('Interactions', () => {
-    it('enables button once both password inputs match', async () => {
+    const setup = async () => {
       render(SignUpPage);
+      const username = screen.getByLabelText('Username') as HTMLElement;
+      const email = screen.getByLabelText('E-mail') as HTMLElement;
       const pw1 = screen.getByLabelText('Password') as HTMLElement;
       const pw2 = screen.getByLabelText('Password Repeat') as HTMLElement;
+
+      await userEvent.type(username, 'user1');
+      await userEvent.type(email, 'user1@mail.com');
       await userEvent.type(pw1, 'P4ssword');
-      await userEvent.type(pw2, 'P4ssword');
+      await userEvent.type(pw2, 'P4ssword');      
+    }
+
+    it('enables button once both password inputs match', async () => {
+      await setup();
 
       const button = screen.getByRole('button', {name: 'Sign Up'});
       expect(button).toBeEnabled();
@@ -91,17 +100,7 @@ describe('Sign Up Page', () => {
       );
       server.listen();
 
-
-      render(SignUpPage);
-      const username = screen.getByLabelText('Username') as HTMLElement;
-      const email = screen.getByLabelText('Email') as HTMLElement;
-      const pw1 = screen.getByLabelText('Password') as HTMLElement;
-      const pw2 = screen.getByLabelText('Password Repeat') as HTMLElement;
-
-      await userEvent.type(username, 'user1');
-      await userEvent.type(email, 'user1@mail.com');
-      await userEvent.type(pw1, 'P4ssword');
-      await userEvent.type(pw2, 'P4ssword');
+      await setup();
       const button = screen.getByRole('button', {name: 'Sign Up'});
 
       await userEvent.click(button);
@@ -113,6 +112,53 @@ describe('Sign Up Page', () => {
         email: "user1@mail.com",
         password: "P4ssword"
       });
+    });
+
+    it('disables the button when there is an ongoing api call', async () => {
+      let counter = 0;
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          counter++;
+          return res(ctx.status(200));
+        })
+      );
+      server.listen();
+
+      await setup();
+      const button = screen.getByRole('button', {name: 'Sign Up'});
+
+      await userEvent.click(button);
+      await userEvent.click(button);
+
+      await server.close();
+
+      expect(counter).toBe(1);
+     
+    });
+
+    it('displays spinner while the api request in progress', async () => {
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(200));
+        })
+      );
+      server.listen();
+
+      await setup();
+      const button = screen.getByRole('button', {name: 'Sign Up'});
+
+      await userEvent.click(button);
+
+      await server.close();
+
+      const spinner = screen.getByRole('status');
+      expect(spinner).toBeInTheDocument();
+    });
+
+    it('does not display spinner when there is no api request', async () => {
+      await setup();
+      const spinner = screen.queryByRole('status');
+      expect(spinner).not.toBeInTheDocument();
     });
   });
 });
