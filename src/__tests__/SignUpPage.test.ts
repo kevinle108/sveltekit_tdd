@@ -90,6 +90,7 @@ describe('Sign Up Page', () => {
 
     beforeEach(() => {
       counter = 0;
+      server.resetHandlers();
     });
 
     let button;
@@ -165,16 +166,6 @@ describe('Sign Up Page', () => {
       expect(text).not.toBeInTheDocument();
     });
 
-    it('hides sign up form after successful sign up request', async () => {
-      await setup();
-      await userEvent.click(button);
-
-      const form = screen.getByTestId('sign-up-form');
-      await waitFor(() => {
-        expect(form).not.toBeInTheDocument();
-      });
-    });
-
     it('does not display account activation message after failed sign up request', async () => {
       server.use(
         rest.post('/api/1.0/users', (req, res, ctx) => {
@@ -190,6 +181,20 @@ describe('Sign Up Page', () => {
       const text = screen.queryByText('Please check your e-mail to activate your account');
       expect(text).not.toBeInTheDocument();
     });
+    
+
+    it('hides sign up form after successful sign up request', async () => {
+      await setup();
+      await userEvent.click(button);
+
+      const form = screen.getByTestId('sign-up-form');
+      await waitFor(() => {
+        expect(form).not.toBeInTheDocument();
+      });
+    });
+
+    
+    
   });
 });
 
