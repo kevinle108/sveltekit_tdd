@@ -15,7 +15,6 @@
 
 
   const submit = () => {
-    disabled = true;
     apiProgress = true;
     axios.post('/api/1.0/users', {
       username,
@@ -27,6 +26,7 @@
       if (error.response.status === 400) {
         errors = error.response.data.validationErrors;
       }
+      apiProgress = false;
     });
   }
 
@@ -41,8 +41,8 @@
       <div class="form-group">
         <label for="username">Username</label>
         <input id="username" class="form-control" bind:value={username}/>
-        {#if errors.username}
-          <span role="alert">{errors.username}</span> 
+        {#if errors['username']}
+          <span role="alert">{errors['username']}</span> 
         {/if}
                
       </div>
@@ -60,7 +60,7 @@
       </div>
       <div class="text-center">
 
-        <button class="btn btn-primary" {disabled} on:click|preventDefault={submit}>
+        <button class="btn btn-primary" disabled={disabled || apiProgress} on:click|preventDefault={submit}>
           {#if apiProgress}
             <span class="spinner-border spinner-border-sm" role="status"></span>          
           {/if}
